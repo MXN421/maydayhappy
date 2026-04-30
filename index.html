@@ -1,122 +1,699 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>五一公园守护局</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>五一匿名守护行动</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    :root{--bg:#f6f2e9;--card:#fffdf8;--ink:#2f2a23;--muted:#786b5a;--line:rgba(72,55,34,.14);--accent:#6f8f4e;--gold:#b67b4c;--danger:#b95c50;--blue:#5a7fa0;--shadow:0 12px 30px rgba(76,54,24,.10);--radius:22px}
-    *{box-sizing:border-box} body{margin:0;min-height:100vh;background:radial-gradient(circle at top left,rgba(160,190,120,.32),transparent 36%),radial-gradient(circle at bottom right,rgba(211,155,89,.25),transparent 34%),var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif} button,input,textarea,select{font:inherit} button{cursor:pointer;border:0} input,textarea,select{width:100%;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.85);padding:12px 14px;color:var(--ink);outline:none} textarea{min-height:92px;resize:vertical;line-height:1.55} input:focus,textarea:focus,select:focus{border-color:rgba(111,143,78,.5);box-shadow:0 0 0 4px rgba(111,143,78,.12)}
-    .app{max-width:980px;margin:0 auto;padding:16px 14px 96px}.top{position:sticky;top:0;z-index:30;margin:-16px -14px 14px;padding:calc(12px + env(safe-area-inset-top)) 14px 12px;backdrop-filter:blur(18px);background:rgba(246,242,233,.82);border-bottom:1px solid rgba(72,55,34,.08)}.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}.brand h1{font-size:20px;margin:0}.brand small{display:block;margin-top:3px;color:var(--muted)}.pill,.chip{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.66);border:1px solid var(--line);color:var(--muted);font-size:12px;white-space:nowrap}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}.card{grid-column:span 12;background:rgba(255,253,248,.9);border:1px solid rgba(72,55,34,.1);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}@media(min-width:720px){.half{grid-column:span 6}.third{grid-column:span 4}}.card h2{font-size:18px;margin:0 0 10px}.card h3{font-size:15px;margin:14px 0 8px}.muted{color:var(--muted)}.small{font-size:12px}.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.space{justify-content:space-between}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;border-radius:16px;padding:10px 14px;background:var(--accent);color:white;font-weight:700;box-shadow:0 10px 20px rgba(111,143,78,.18)}.btn.secondary{background:rgba(47,42,35,.08);color:var(--ink);box-shadow:none}.btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(111,143,78,.28);box-shadow:none}.btn.warn{background:var(--danger)}.btn.gold{background:var(--gold)}.btn.blue{background:var(--blue)}.btn.full{width:100%}.btn:disabled{opacity:.45;cursor:not-allowed}.btns{display:grid;gap:10px;grid-template-columns:1fr}@media(min-width:560px){.btns.two{grid-template-columns:1fr 1fr}.btns.three{grid-template-columns:repeat(3,1fr)}}.notice,.role-banner{padding:12px;border-radius:18px;background:rgba(90,127,160,.12);border:1px solid rgba(90,127,160,.18);line-height:1.6}.role-banner{background:rgba(111,143,78,.12);border-color:rgba(111,143,78,.2);display:grid;gap:8px}.event-box{border-radius:18px;padding:14px;background:linear-gradient(135deg,rgba(111,143,78,.14),rgba(182,123,76,.10));border:1px solid rgba(111,143,78,.18);line-height:1.65}.log{display:grid;gap:9px;max-height:520px;overflow:auto}.log-item{border-left:4px solid rgba(111,143,78,.45);padding:10px 12px;background:rgba(255,255,255,.62);border-radius:14px;line-height:1.55}.log-item.danger{border-left-color:rgba(185,92,80,.65)}.log-item.gold{border-left-color:rgba(182,123,76,.70)}.player-list{display:grid;gap:8px}.player{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.58);border:1px solid var(--line)}.avatar{width:34px;height:34px;border-radius:50%;display:inline-grid;place-items:center;background:rgba(111,143,78,.16);color:var(--accent);font-weight:800}.card-face{border-radius:18px;padding:14px;border:1px solid var(--line);background:rgba(255,255,255,.68);display:grid;gap:8px}.count{font-weight:800;color:var(--accent)}.hidden,.role-hidden{display:none!important}.modal-backdrop{position:fixed;inset:0;z-index:100;background:rgba(35,30,24,.42);display:grid;place-items:end center;padding:12px}.modal{width:min(680px,100%);max-height:88vh;overflow:auto;background:var(--card);border-radius:26px;padding:18px;box-shadow:0 24px 70px rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.5)}@media(min-width:720px){.modal-backdrop{place-items:center}}.section{display:none}.section.active{display:block;animation:fade .18s ease-out}@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:680px}th,td{text-align:left;border-bottom:1px solid var(--line);padding:10px 8px;vertical-align:top}th{color:var(--muted);font-size:12px}.tabs{position:fixed;z-index:50;left:0;right:0;bottom:0;padding:8px 10px calc(8px + env(safe-area-inset-bottom));background:rgba(255,253,248,.92);backdrop-filter:blur(18px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);gap:7px}.tab{border-radius:16px;padding:8px 4px;background:transparent;color:var(--muted);font-size:12px;display:grid;gap:3px;place-items:center}.tab.active{background:rgba(111,143,78,.13);color:var(--accent);font-weight:700}.tab span:first-child{font-size:18px;line-height:1}.toast{position:fixed;left:50%;bottom:86px;z-index:200;transform:translateX(-50%);background:rgba(47,42,35,.92);color:white;border-radius:999px;padding:10px 14px;max-width:90%;text-align:center;box-shadow:0 12px 34px rgba(0,0,0,.18);display:none}.toast.show{display:block}.setup-inputs{display:grid;gap:10px}.fab{position:fixed;right:14px;bottom:92px;z-index:70;border-radius:50%;width:50px;height:50px;background:var(--ink);color:white;box-shadow:var(--shadow)}
+    :root {
+      --bg: #fff8ef;
+      --card: #ffffff;
+      --text: #2d241f;
+      --muted: #7b6f67;
+      --line: #eadfd2;
+      --accent: #f08a5d;
+      --accent-2: #ffd7ba;
+      --soft: #fff1e5;
+      --danger: #b54545;
+      --shadow: 0 12px 30px rgba(80, 46, 20, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #fff2df 0, var(--bg) 45%, #fffaf5 100%);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .wrap {
+      width: min(980px, 100%);
+      margin: 0 auto;
+      padding: 18px 14px 60px;
+    }
+
+    header {
+      padding: 22px 4px 10px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(26px, 7vw, 42px);
+      letter-spacing: 0.03em;
+    }
+
+    .subtitle {
+      margin: 0 auto;
+      max-width: 720px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: rgba(255,255,255,0.92);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    .card.full { grid-column: 1 / -1; }
+
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 20px;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 0 0 12px;
+    }
+
+    .roombar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: end;
+      margin-top: 16px;
+    }
+
+    @media (max-width: 520px) {
+      .roombar { grid-template-columns: 1fr; }
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 12px;
+      font: inherit;
+      background: #fffdf9;
+      color: var(--text);
+      outline: none;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 88px;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(240, 138, 93, 0.14);
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 16px;
+      font: inherit;
+      font-weight: 700;
+      background: var(--accent);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(240, 138, 93, 0.22);
+      min-height: 46px;
+    }
+
+    button.secondary {
+      background: #fff;
+      color: var(--text);
+      border: 1px solid var(--line);
+      box-shadow: none;
+    }
+
+    button.ghost {
+      background: var(--soft);
+      color: var(--text);
+      box-shadow: none;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btnrow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .resultBox {
+      margin-top: 12px;
+      background: var(--soft);
+      border: 1px solid var(--accent-2);
+      border-radius: 18px;
+      padding: 12px;
+      min-height: 58px;
+    }
+
+    .resultBox ol {
+      margin: 6px 0 0 22px;
+      padding: 0;
+    }
+
+    .formgrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (max-width: 520px) {
+      .formgrid { grid-template-columns: 1fr; }
+    }
+
+    .wall {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 520px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .entry {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 12px;
+      background: #fffdf9;
+    }
+
+    .entryTop {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: baseline;
+      margin-bottom: 6px;
+    }
+
+    .tag {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 3px 9px;
+      font-size: 12px;
+      background: var(--soft);
+      color: #8a4a27;
+      font-weight: 700;
+    }
+
+    .time {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .entryContent {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .clues {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    @media (max-width: 860px) {
+      .clues { grid-template-columns: 1fr; }
+    }
+
+    .clueGroup {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 12px;
+      background: #fffdf9;
+    }
+
+    .clueGroup h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+
+    .clueGroup ol {
+      margin: 0 0 0 22px;
+      padding: 0;
+      font-size: 14px;
+    }
+
+    .clueGroup li { margin-bottom: 7px; }
+
+    .setupWarn {
+      display: none;
+      border: 1px solid #f0b3b3;
+      background: #fff0f0;
+      color: var(--danger);
+      border-radius: 18px;
+      padding: 12px;
+      margin-top: 14px;
+      text-align: left;
+    }
+
+    .small {
+      font-size: 13px;
+      color: var(--muted);
+    }
   </style>
 </head>
 <body>
-  <div class="app">
-    <header class="top"><div class="brand"><div><h1>五一公园守护局</h1><small id="subtitle">轻量 H5 · 支持单机/多人联机</small></div><div class="pill" id="modePill">未开始</div></div></header>
-    <main>
-      <section id="sec-home" class="section active">
-        <div class="grid">
-          <div class="card"><h2>快速开始</h2><div class="role-banner"><strong>请选择今天的使用方式</strong><div class="muted small">玩家进入后主要查看自己的身份、手牌、线索和守护响应；房主/轻主持负责创建事件、发放线索和生成终局。</div><div class="btns two"><button class="btn blue" onclick="openPlayerStartModal()">我是玩家，加入游戏</button><button class="btn gold" onclick="openHostStartModal()">我是房主/轻主持</button></div></div></div>
-          <div class="card"><div class="row space"><div><h2>当前状态</h2><div class="muted" id="homeStatus">请先在“设置”里创建游戏。</div></div><button class="btn ghost" onclick="renderAll()">刷新</button></div><div id="currentEventBox" class="event-box" style="margin-top:12px"></div></div>
-          <div class="card half"><h2>快速入口</h2><div class="btns two"><button class="btn host-only" onclick="go('event')">创建事件</button><button class="btn blue" onclick="openJoinModal()">加入身份</button><button class="btn secondary" onclick="go('me')">我的身份</button><button class="btn secondary" onclick="go('clue')">我的线索</button><button class="btn gold" onclick="openFinalModal()">终局回答</button><button class="btn blue" onclick="openResourceModal()">资源/补卡</button><button class="btn secondary host-only" onclick="openAdminModal()">轻主持控制</button><button class="btn secondary" onclick="openRoleModal()">切换视图</button></div></div>
-          <div class="card half"><h2>玩法核心</h2><p class="muted" style="line-height:1.7;margin:0">事件制造守护机会，守护产生线索，线索延迟发放，终局根据守护关系、猜测结果、守护记录和 MVP 投票自动揭晓。</p></div>
-          <div class="card"><div class="row space"><h2>公共事件记录</h2><button class="btn secondary host-only" onclick="clearLogsConfirm()">清空记录</button></div><div id="publicLog" class="log"></div></div>
+  <div class="wrap">
+    <header>
+      <h1>五一匿名守护行动</h1>
+      <p class="subtitle">随机抽取任务和小惩罚，每次抽取都会记录时间与内容；线索库直接查看；公共留言墙可以匿名显示“谁对谁留言”。</p>
+      <div id="setupWarn" class="setupWarn">
+        还没有配置 Supabase。请先在代码顶部填写 <b>SUPABASE_URL</b> 和 <b>SUPABASE_ANON_KEY</b>，否则只能看到页面，不能保存公共记录。
+      </div>
+      <div class="roombar">
+        <div>
+          <label for="roomCode">房间码</label>
+          <input id="roomCode" value="0501" placeholder="例如：0501" />
+        </div>
+        <button id="saveRoomBtn" class="secondary">保存房间码</button>
+      </div>
+    </header>
+
+    <main class="grid">
+      <section class="card">
+        <h2>守护任务抽取</h2>
+        <p class="hint">每次随机抽 3 条，可以多次抽取；抽取结果会同步记录到公共记录里。</p>
+        <button id="drawTaskBtn">随机抽 3 条任务</button>
+        <div id="taskResult" class="resultBox">还没有抽取任务。</div>
+      </section>
+
+      <section class="card">
+        <h2>小惩罚抽取</h2>
+        <p class="hint">适合猜错、太明显、任务失败或现场临时加戏时使用。</p>
+        <button id="drawPenaltyBtn">随机抽 3 条惩罚</button>
+        <div id="penaltyResult" class="resultBox">还没有抽取惩罚。</div>
+      </section>
+
+      <section class="card full">
+        <h2>匿名公共留言</h2>
+        <p class="hint">可以显示“谁对谁留言”。为了保持神秘，发件人可以写“匿名守护者”“某个路过的人”“你的守护者”等。</p>
+        <div class="formgrid">
+          <div>
+            <label for="fromName">谁留言</label>
+            <input id="fromName" placeholder="例如：匿名守护者" value="匿名守护者" />
+          </div>
+          <div>
+            <label for="toName">对谁留言</label>
+            <input id="toName" placeholder="例如：小A / 大家 / 某个幸运的人" />
+          </div>
+        </div>
+        <div style="margin-top:10px;">
+          <label for="messageText">留言内容</label>
+          <textarea id="messageText" placeholder="例如：你今天可能已经被悄悄守护过了。"></textarea>
+        </div>
+        <div class="btnrow">
+          <button id="sendMsgBtn">发布留言</button>
+          <button id="quickMsgBtn" class="ghost">随机生成一句留言</button>
         </div>
       </section>
-      <section id="sec-me" class="section"><div class="grid"><div class="card"><h2>选择你的玩家身份</h2><div class="btns two" style="margin-bottom:10px"><button class="btn blue" onclick="openJoinModal()">用加入码进入</button><button class="btn secondary" onclick="toggleDebugSelect()">显示调试选择</button></div><div id="debugSelectBox" class="hidden"><select id="meSelect" onchange="setMe(this.value)"></select><p class="small muted">调试选择适合单机测试。正式联机时建议用加入码进入。</p></div><p class="small muted">配置 Supabase 后，大家可以用不同手机加入同一房间并同步数据。</p></div><div class="card half"><h2>我的身份</h2><div id="myIdentity"></div></div><div class="card half"><h2>我的手牌</h2><div id="myCards" class="log"></div></div><div class="card"><h2>我的守护记录</h2><div id="myGuardianStats"></div></div></div></section>
-      <section id="sec-event" class="section"><div class="grid"><div class="card host-only"><h2>创建事件</h2><div class="setup-inputs"><label>事件类型<select id="eventType"><option value="punishment">惩罚</option><option value="task">任务</option><option value="challenge">挑战</option><option value="reward">奖励/资源</option></select></label><label>事件对象<select id="eventTargetMode" onchange="renderTargetPicker()"><option value="single">指定一人</option><option value="random">随机一人</option><option value="all">全体成员</option></select></label><div id="targetPicker"></div><label>内容来源<select id="eventSource" onchange="toggleCustomEventText()"><option value="library">从系统库随机抽取</option><option value="custom">现场输入</option></select></label><textarea id="customEventText" class="hidden" placeholder="请输入现场任务或惩罚内容。"></textarea><div class="btns two"><button class="btn" onclick="createGameEvent()">发布事件</button><button class="btn secondary" onclick="drawPreview()">先随机预览</button></div><div id="eventPreview" class="notice hidden"></div></div></div><div class="card host-only"><h2>本轮事件结算</h2><div id="eventControl"></div></div><div class="card"><h2>守护响应</h2><div id="guardianResponse"></div></div></div></section>
-      <section id="sec-clue" class="section"><div class="grid"><div class="card half"><h2>我的线索</h2><div id="myClues" class="log"></div></div><div class="card half"><h2>推理备注</h2><textarea id="myNote" placeholder="写下你的推理备注……" oninput="saveMyNote()"></textarea><button class="btn secondary full" style="margin-top:10px" onclick="saveMyNote(true)">保存备注</button></div><div class="card host-only"><div class="row space"><h2>线索缓冲区</h2><button class="btn blue" onclick="releaseBufferedClues()">发放可公开线索</button></div><p class="muted small">守护者提交的线索先进入缓冲区，不立即发放。</p><div id="bufferedClues" class="log"></div></div></div></section>
-      <section id="sec-final" class="section"><div class="grid"><div class="card"><div class="row space"><h2>终局揭晓</h2><button class="btn gold host-only" onclick="finishGame()">生成终局结果</button></div><p class="muted small">游戏结束前，每位玩家提交两个问题：猜自己的守护者，以及投票今日 MVP。</p><div id="finalSummary"></div></div><div class="card"><h2>守护关系与猜测</h2><div id="finalTable" class="table-wrap"></div></div><div class="card"><h2>系统奖项</h2><div id="awards" class="grid"></div></div><div class="card"><h2>每位玩家守护报告</h2><div id="reports" class="log"></div></div></div></section>
-      <section id="sec-settings" class="section"><div class="grid"><div class="card"><h2>当前视图</h2><div id="rolePanel" class="role-banner"></div></div><div class="card host-only"><h2>创建/重置游戏</h2><p class="muted">输入 8 位玩家姓名。系统会随机生成守护链。</p><div id="playerInputs" class="setup-inputs"></div><div class="btns two" style="margin-top:12px"><button class="btn" onclick="initGame()">随机开始游戏</button><button class="btn secondary" onclick="fillDemoNames()">填入示例名字</button></div><div id="accessCodeBox" style="margin-top:14px"></div></div><div class="card half host-only"><h2>任务库</h2><textarea id="taskLibrary"></textarea><button class="btn secondary full" style="margin-top:10px" onclick="saveLibraries()">保存任务库</button></div><div class="card half host-only"><h2>惩罚库</h2><textarea id="punishLibrary"></textarea><button class="btn secondary full" style="margin-top:10px" onclick="saveLibraries()">保存惩罚库</button></div><div class="card"><h2>多人联机同步</h2><p class="muted">配置 Supabase 后，大家可以用不同手机打开同一个网页，输入同一个房间码，实时同步数据。</p><div class="setup-inputs"><label>Supabase URL<input id="cloudUrl" placeholder="https://xxxx.supabase.co"></label><label>Supabase publishable / anon key<input id="cloudKey" placeholder="sb_publishable_... 或 eyJhbGci..."></label><label>房间码<input id="cloudRoom" placeholder="例如 MAYDAY2026"></label><div class="btns two"><button class="btn blue" onclick="connectCloud()">连接/加入房间</button><button class="btn secondary" onclick="pushCloudNow()">上传当前数据</button><button class="btn secondary" onclick="pullCloudNow()">拉取房间数据</button><button class="btn warn" onclick="disconnectCloud()">断开联机</button><button class="btn secondary" onclick="copyPlayerEntryLink()">复制玩家入口链接</button></div><div id="cloudStatus" class="notice">未连接云同步。</div></div><h3>Supabase SQL</h3><textarea readonly style="min-height:210px">create table if not exists picnic_rooms (
-  room_id text primary key,
-  payload jsonb not null,
-  updated_at timestamptz default now()
-);
 
-alter table picnic_rooms enable row level security;
+      <section class="card full">
+        <div class="entryTop">
+          <h2 style="margin:0;">公共记录与留言墙</h2>
+          <button id="refreshBtn" class="secondary">刷新</button>
+        </div>
+        <p class="hint">这里会显示所有抽取记录和所有公共留言。每 8 秒会自动刷新一次。</p>
+        <div id="wall" class="wall">
+          <div class="entry">正在加载……</div>
+        </div>
+      </section>
 
-drop policy if exists "picnic_rooms_read" on picnic_rooms;
-drop policy if exists "picnic_rooms_write" on picnic_rooms;
-drop policy if exists "picnic_rooms_update" on picnic_rooms;
-
-create policy "picnic_rooms_read" on picnic_rooms for select using (true);
-create policy "picnic_rooms_write" on picnic_rooms for insert with check (true);
-create policy "picnic_rooms_update" on picnic_rooms for update using (true) with check (true);
-
-do $$
-begin
-  alter publication supabase_realtime add table picnic_rooms;
-exception when duplicate_object then null;
-end $$;</textarea></div><div class="card host-only"><h2>数据管理</h2><div class="btns two"><button class="btn secondary" onclick="exportData()">导出数据</button><button class="btn secondary" onclick="document.getElementById('importFile').click()">导入数据</button><button class="btn warn" onclick="resetAllConfirm()">彻底重置</button></div><input id="importFile" type="file" accept="application/json" class="hidden" onchange="importData(event)"><p class="muted small">当前数据也会保存在本机浏览器 localStorage 中。</p></div></div></section>
+      <section class="card full">
+        <h2>线索库</h2>
+        <p class="hint">线索库不随机抽取，直接按阶段罗列，大家可以自己选择适合当前进度的一条发布。</p>
+        <div class="clues">
+          <div class="clueGroup">
+            <h3>前期模糊线索</h3>
+            <ol id="clueA"></ol>
+          </div>
+          <div class="clueGroup">
+            <h3>中期线索</h3>
+            <ol id="clueB" start="11"></ol>
+          </div>
+          <div class="clueGroup">
+            <h3>后期明显线索</h3>
+            <ol id="clueC" start="21"></ol>
+          </div>
+        </div>
+      </section>
     </main>
   </div>
-  <nav class="tabs"><button class="tab active" data-go="home" onclick="go('home')"><span>🏕️</span><span>首页</span></button><button class="tab" data-go="me" onclick="go('me')"><span>🧑‍🤝‍🧑</span><span>我的</span></button><button class="tab" data-go="event" onclick="go('event')"><span>🎲</span><span>事件</span></button><button class="tab" data-go="clue" onclick="go('clue')"><span>🕵️</span><span>线索</span></button><button class="tab" data-go="final" onclick="go('final')"><span>🏆</span><span>终局</span></button></nav>
-  <button class="fab" onclick="go('settings')">⚙️</button>
-  <div id="modalRoot"></div><div id="toast" class="toast"></div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script>
-    const STORE='picnic_guardian_fixed_v1';
-    const CLOUD_STORE='picnic_guardian_cloud_config_v1';
-    const defaultTasks=['用20秒给一种零食打广告。','15秒内说出5种适合野餐的食物。','给今天的天气起一个文学化标题。','给自己的鸡蛋或任意零食取一个名字。','拍一张不露脸的“今日野餐证据照”。','找一个身边物品，把它介绍成科研设备。','用一句话总结今天目前最有节目效果的瞬间。','和随机一人完成一个默契问答。','用三个词描述今天的公园，不能出现“好”“美”“舒服”。','给大家推荐一个你觉得最好吃的东西，但不能说它的名字。'];
-    const defaultPunishments=['用播音腔读出下一轮规则。','给一种零食写一句广告词。','原地做一个5秒“正式但没用”的动作。','负责下一轮抽签或点击系统按钮。','模仿导航语音说一句“前方到达野餐主会场”。','给自己今天的状态起一个标题。','用很学术的语言评价一种零食。','给现场任意物品命名为一个高级科研装置。','拍一张“野餐桌面全家福”。','用一句话安利你面前最近的一种食物。'];
-    const debtTasks=['终局前给今天的活动起一个名字。','终局前用一句话总结今天最搞笑的瞬间。','终局前给一种零食写一句广告词。','终局前拍一张不露脸的“野餐证据照”。','终局前负责整理一次垃圾袋。','终局前用学术语言评价一种水果。','终局前给今天的天气取一个标题。','终局前给全员说一句不尴尬的夸奖。'];
-    const genericClues={feature:['TA今天的穿搭或随身物品中，有一个比较容易被注意到的特征。','TA今天带来的东西曾经出现在野餐区域中央附近。','TA今天至少一次主动参与过规则讨论。','TA今天的座位或站位曾经离你不远。'],behavior:['TA曾经在你受罚或被点名前后留意过你的状态。','TA今天至少一次通过系统影响了事件。','TA今天的守护方式偏低调。','TA曾经让某个事件变得更轻松。'],exclusion:['TA不是刚才和你同组的人。','TA不是本轮第一个接受任务的人。','TA在刚才事件中没有被点名。','TA不是你此刻最容易怀疑的那个人。']};
-    const cardDefs={wu:{name:'无懈可击',desc:'削弱守护对象本次惩罚，但不能取消。'},tao:{name:'桃子',desc:'取消守护对象本次惩罚；不能使用迷雾或通用线索。'},straw:{name:'替身草人',desc:'将惩罚转移给全体、随机一人或指定一人。'},spring:{name:'春风令',desc:'让守护对象获得1枚春风点。'}};
-    let state=loadState();
-    let me=localStorage.getItem('picnic_guardian_me')||'';
-    let role=localStorage.getItem('picnic_guardian_role')||'player';
-    let cloud={enabled:false,client:null,roomId:'',subscription:null,applyingRemote:false,pushTimer:null,lastStatus:'未连接云同步。'};
-    function freshState(){return{started:false,players:[],tasks:[...defaultTasks],punishments:[...defaultPunishments],logs:[],currentEvent:null,bufferedClues:[],releasedClues:[],final:{finished:false,guesses:{},mvpVotes:{},reasons:{}},supplyUsed:false};}
-    function loadState(){try{return JSON.parse(localStorage.getItem(STORE))||freshState();}catch(e){return freshState();}}
-    function clone(x){return JSON.parse(JSON.stringify(x));}
-    function save(){localStorage.setItem(STORE,JSON.stringify(state));scheduleCloudPush();}
-    function now(){return new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});} function id(){return Math.random().toString(36).slice(2,10);} function pick(a){return a[Math.floor(Math.random()*a.length)];} function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;} function esc(s){return String(s??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));}
-    function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);} function log(text,type='normal'){state.logs.unshift({id:id(),time:now(),text,type});save();renderAll();}
-    function getPlayer(pid){return state.players.find(p=>p.id===pid);} function getMe(){return getPlayer(me);} function actualGuardianOf(pid){return state.players.find(p=>p.guardTarget===pid);} function handCount(p){return Object.values(p.cards||{}).reduce((a,b)=>a+b,0);}
-    function go(sec){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById('sec-'+sec).classList.add('active');document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.go===sec));renderAll();}
-    function renderAll(){renderTop();renderHome();renderMe();renderEvent();renderClues();renderFinal();renderSettings();renderCloudSettings();applyRoleView();}
-    function renderTop(){document.getElementById('modePill').textContent=cloud.enabled?`联机：${cloud.roomId}`:(state.started?`${state.players.length}人游戏中`:'未开始');document.getElementById('subtitle').textContent=state.started?`当前身份：${getPlayer(me)?.name||me||'未选择'}｜${role==='host'?'房主视图':'玩家视图'}`:'轻量 H5 · 支持单机/多人联机';}
-    function renderHome(){document.getElementById('homeStatus').textContent=state.started?'游戏已开始。请创建事件，等待守护者暗中出牌。':'请先在“设置”里创建游戏。';const box=document.getElementById('currentEventBox');box.innerHTML=state.currentEvent?`<strong>${eventTypeName(state.currentEvent.type)}：${esc(state.currentEvent.targetName)}</strong><p style="margin:8px 0 0">${esc(state.currentEvent.text)}</p><div class="row" style="margin-top:10px"><span class="chip">状态：${esc(state.currentEvent.status)}</span><span class="chip">${state.currentEvent.time}</span></div>`:'<strong>暂无当前事件</strong><p class="muted" style="margin:8px 0 0">可以在“事件”页发布任务或惩罚。</p>';document.getElementById('publicLog').innerHTML=state.logs.length?state.logs.map(l=>`<div class="log-item ${l.type}"><strong>${l.time}</strong><br>${esc(l.text)}</div>`).join(''):'<div class="muted">暂无记录。</div>';}
-    function renderMe(){const sel=document.getElementById('meSelect');if(sel)sel.innerHTML='<option value="">请选择</option>'+state.players.map(p=>`<option value="${p.id}" ${me===p.id?'selected':''}>${esc(p.name)}</option>`).join('');const p=getMe();document.getElementById('myIdentity').innerHTML=p?`<div class="player"><div><strong>${esc(p.name)}</strong><div class="muted small">你的守护对象：${esc(getPlayer(p.guardTarget)?.name||'未知')}</div></div><span class="avatar">${esc((p.name||'?')[0])}</span></div><div class="row" style="margin-top:10px"><span class="chip">通用线索权：${p.genericClueUsed?'已用':'未用'}</span><span class="chip">迷雾标记：${p.fogUsed?'已用':'未用'}</span><span class="chip">春风点：${p.springPoints||0}</span><span class="chip">任务换卡：${p.exchangeUsed?'已用':'未用'}</span></div>`:'<div class="muted">请选择或加入你的身份。</div>';document.getElementById('myCards').innerHTML=p?renderCardList(p):'<div class="muted">暂无。</div>';document.getElementById('myGuardianStats').innerHTML=p?renderStats(p):'<div class="muted">暂无。</div>';const note=document.getElementById('myNote');if(p&&document.activeElement!==note)note.value=p.note||'';}
-    function renderCardList(p){return Object.entries(p.cards||{}).filter(([,c])=>c>0).map(([k,c])=>`<div class="card-face"><div class="row space"><strong>${cardDefs[k].name}</strong><span class="count">×${c}</span></div><div class="muted small">${cardDefs[k].desc}</div></div>`).join('')||'<div class="muted">手牌已用完。</div>';}
-    function renderStats(p){const rate=p.guardianChances?Math.round((p.guardianActs||0)/p.guardianChances*100):0;const debts=(p.debtTasks||[]).map((d,i)=>`<div class="log-item"><strong>欠账任务${i+1}</strong><br>${esc(d.text)}<br><span class="muted small">状态：${d.done?'已完成':'待完成'}</span></div>`).join('');return`<div class="row"><span class="chip">守护机会：${p.guardianChances||0}</span><span class="chip">实际守护：${p.guardianActs||0}</span><span class="chip">响应率：${rate}%</span><span class="chip">线索提交：${p.cluesGiven||0}</span></div>${debts?'<h3>我的欠账任务</h3>'+debts:''}`;}
-    function setMe(v){me=v;localStorage.setItem('picnic_guardian_me',me);renderAll();} function toggleDebugSelect(){document.getElementById('debugSelectBox')?.classList.toggle('hidden');}
-    function makeAccessCode(i){const letters='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s=String(i+1);for(let k=0;k<3;k++)s+=letters[Math.floor(Math.random()*letters.length)];return s;}
-    function openJoinModal(){showModal(`<h2>加入我的身份</h2><p class="muted">请输入自己的姓名和加入码。</p><label>我的姓名<input id="joinName" placeholder="例如：小王"></label><label style="display:block;margin-top:10px">我的加入码<input id="joinCode" placeholder="例如：1Q7K"></label><button class="btn full" style="margin-top:12px" onclick="submitJoinCode()">进入游戏</button><button class="btn secondary full" style="margin-top:10px" onclick="closeModal()">关闭</button>`);} function submitJoinCode(){const name=document.getElementById('joinName').value.trim();const code=document.getElementById('joinCode').value.trim().toUpperCase();const p=state.players.find(x=>x.name===name&&String(x.accessCode||'').toUpperCase()===code);if(!p)return toast('姓名或加入码不正确');role='player';localStorage.setItem('picnic_guardian_role',role);setMe(p.id);closeModal();toast(`已进入${p.name}的身份`);go('me');}
-    function eventTypeName(t){return({punishment:'惩罚',task:'任务',challenge:'挑战',reward:'奖励/资源'})[t]||'事件';} function renderTargetPicker(){const mode=document.getElementById('eventTargetMode')?.value||'single';const box=document.getElementById('targetPicker');if(!box)return;if(mode==='single')box.innerHTML=`<label>指定对象<select id="eventTarget">${state.players.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select></label>`;else box.innerHTML=`<div class="notice">${mode==='random'?'系统将随机抽取一名玩家。':'本事件面向全体成员。'}</div>`;} function toggleCustomEventText(){document.getElementById('customEventText')?.classList.toggle('hidden',document.getElementById('eventSource')?.value!=='custom');}
-    function drawEventText(){const type=document.getElementById('eventType').value;if(type==='punishment')return pick(state.punishments);if(type==='task')return pick(state.tasks);if(type==='challenge')return pick([...state.tasks,...state.punishments]);return'目标获得一次轻量资源：可获得1枚春风点，或换一次题。';} function drawPreview(){const box=document.getElementById('eventPreview');box.classList.remove('hidden');box.innerHTML=`<strong>预览：</strong>${esc(drawEventText())}`;}
-    function createGameEvent(){if(!state.started)return toast('请先创建游戏');const type=document.getElementById('eventType').value,mode=document.getElementById('eventTargetMode').value,source=document.getElementById('eventSource').value;let targetId='all',targetName='全体成员';if(mode==='single'){targetId=document.getElementById('eventTarget').value;targetName=getPlayer(targetId)?.name||'未知';}if(mode==='random'){const p=pick(state.players);targetId=p.id;targetName=p.name;}const text=source==='custom'?document.getElementById('customEventText').value.trim():drawEventText();if(!text)return toast('请输入事件内容');state.currentEvent={id:id(),type,mode,targetId,targetName,text,status:'守护响应中',time:now(),protectedBy:null,cardUsed:null};if(targetId!=='all'){const g=actualGuardianOf(targetId);if(g)g.guardianChances=(g.guardianChances||0)+1;}log(`发布${eventTypeName(type)}：${targetName}｜${text}`,type==='punishment'?'danger':'normal');save();renderAll();}
-    function renderEvent(){renderTargetPicker();toggleCustomEventText();const control=document.getElementById('eventControl');if(control){if(!state.currentEvent)control.innerHTML='<div class="muted">暂无待结算事件。</div>';else control.innerHTML=`<div class="event-box"><strong>${eventTypeName(state.currentEvent.type)}：${esc(state.currentEvent.targetName)}</strong><p>${esc(state.currentEvent.text)}</p><span class="chip">${esc(state.currentEvent.status)}</span></div><div class="btns two" style="margin-top:12px"><button class="btn" onclick="finishCurrentEvent()">事件完成 / 进入感想</button><button class="btn secondary" onclick="cancelCurrentEvent()">取消本轮事件</button></div>`;}renderGuardianResponse();}
-    function renderGuardianResponse(){const box=document.getElementById('guardianResponse');const p=getMe(),ev=state.currentEvent;if(!p){box.innerHTML='<div class="muted">请先加入或选择身份。</div>';return;}if(!ev){box.innerHTML='<div class="muted">暂无事件。</div>';return;}if(ev.targetId===p.guardTarget&&ev.status==='守护响应中'){box.innerHTML=`<div class="notice"><strong>你的守护对象正在经历事件。</strong><br>你可以不守护，也可以发动一张守护卡并提交线索。</div><div class="btns two" style="margin-top:12px"><button class="btn secondary" onclick="toast('已选择不守护。本轮结束后可输入普通感想。')">不守护</button><button class="btn" onclick="openCardModal()">发动守护</button></div>`;}else box.innerHTML='<div class="muted">你不是本轮事件对象的守护者，或本轮已过守护响应阶段。</div>';}
-    function openCardModal(){const p=getMe();const available=Object.entries(p.cards||{}).filter(([,v])=>v>0);if(!available.length)return toast('你没有可用手牌');showModal(`<h2>选择守护卡</h2><div class="log">${available.map(([k,c])=>`<div class="card-face"><div class="row space"><strong>${cardDefs[k].name}</strong><span class="count">×${c}</span></div><div class="muted small">${cardDefs[k].desc}</div><button class="btn full" onclick="useCard('${k}')">使用${cardDefs[k].name}</button></div>`).join('')}</div><button class="btn secondary full" style="margin-top:12px" onclick="closeModal()">取消</button>`);} 
-    function useCard(k){const p=getMe(),ev=state.currentEvent;if(!p||!ev)return;if((p.cards[k]||0)<=0)return toast('这张牌已经没有了');p.cards[k]--;p.guardianActs=(p.guardianActs||0)+1;p.cardUsage=p.cardUsage||{};p.cardUsage[k]=(p.cardUsage[k]||0)+1;ev.protectedBy=p.id;ev.cardUsed=k;ev.status='已守护，等待线索';let text=`神秘守护者发动【${cardDefs[k].name}】。`;if(k==='wu')text+='本次惩罚被削弱，但仍需完成。';if(k==='tao')text+='本次惩罚取消；本次将留下较明确线索。';if(k==='spring'){const target=getPlayer(ev.targetId);if(target)target.springPoints=(target.springPoints||0)+1;text+='目标获得1枚春风点。';}if(k==='straw'){const choice=prompt('替身草人转移方式：输入“全体”“随机”或某位玩家姓名。','全体')||'全体';p.strawChoices=p.strawChoices||[];p.strawChoices.push({time:now(),choice});text+=`本次惩罚被转移并降低一级。转移方式：${choice}。`;}log(text,'gold');save();closeModal();openClueSubmitModal(k);}
-    function openClueSubmitModal(cardKey){const p=getMe();const canGeneric=!p.genericClueUsed&&cardKey!=='tao';const canFog=!p.fogUsed&&cardKey!=='tao';showModal(`<h2>提交守护线索</h2><p class="muted">你已发动守护，不需要再输入普通感想。线索会进入缓冲区。</p><label>线索来源<select id="clueMode" onchange="renderClueInput()"><option value="custom">自己输入真实线索</option>${canGeneric?'<option value="generic">使用一次通用线索权</option>':''}</select></label><div id="clueInputBox" style="margin-top:10px"></div>${canFog?'<label style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="useFog" style="width:auto">使用迷雾标记</label>':'<p class="small muted">本次不能使用迷雾，或迷雾已用。</p>'}<button class="btn full" style="margin-top:12px" onclick="submitClue('${cardKey}')">提交线索</button>`);renderClueInput();}
-    function renderClueInput(){const mode=document.getElementById('clueMode')?.value||'custom';const box=document.getElementById('clueInputBox');if(!box)return;if(mode==='custom')box.innerHTML='<textarea id="clueText" placeholder="请写一条真实但不直接暴露身份的线索。"></textarea>';else box.innerHTML=`<label>通用线索类型<select id="genericType"><option value="feature">身份特征型</option><option value="behavior">行为痕迹型</option><option value="exclusion">关系排除型</option></select></label><button class="btn secondary full" style="margin-top:10px" onclick="randomGenericClue()">随机一条通用线索</button><textarea id="clueText" placeholder="点击随机，或自己改写。"></textarea>`;} function randomGenericClue(){const type=document.getElementById('genericType').value;document.getElementById('clueText').value=pick(genericClues[type]);}
-    function submitClue(cardKey){const p=getMe(),ev=state.currentEvent;const mode=document.getElementById('clueMode').value,text=document.getElementById('clueText').value.trim(),fog=!!document.getElementById('useFog')?.checked;if(!text)return toast('请填写或抽取线索');if(cardKey==='tao'&&mode==='generic')return toast('桃子不能使用通用线索');if(cardKey==='tao'&&fog)return toast('桃子不能使用迷雾');if(mode==='generic'&&fog)return toast('通用线索不能和迷雾同时使用');if(mode==='generic')p.genericClueUsed=true;if(fog)p.fogUsed=true;p.cluesGiven=(p.cluesGiven||0)+1;state.bufferedClues.push({id:id(),from:p.id,to:p.guardTarget,eventId:ev?.id,text,fog,mode,time:now(),ready:false,released:false});if(ev)ev.status='已守护，线索缓冲中';log('一条守护线索已进入缓冲区，将在后续事件中延迟出现。');save();closeModal();renderAll();}
-    function finishCurrentEvent(){if(!state.currentEvent)return;const ev=state.currentEvent;log(`事件完成：${ev.targetName}｜${ev.text}`);state.currentEvent=null;state.bufferedClues.forEach(c=>{if(!c.released)c.ready=true;});save();renderAll();openReflectionModal();} function cancelCurrentEvent(){if(!state.currentEvent)return;log(`本轮事件已取消：${state.currentEvent.text}`);state.currentEvent=null;save();renderAll();}
-    function openReflectionModal(){showModal(`<h2>本轮事件感想</h2><p class="muted">未发动守护的玩家可以输入一句观察、安慰、夸奖或吐槽。若刚才已经提交线索，可以关闭。</p><textarea id="reflectionText" placeholder="例如：刚才这一轮很有节目效果。"></textarea><div class="btns two" style="margin-top:12px"><button class="btn" onclick="submitReflection()">提交感想</button><button class="btn secondary" onclick="closeModal()">跳过/关闭</button></div>`);} function submitReflection(){const p=getMe();const text=document.getElementById('reflectionText').value.trim();if(!text)return toast('可以写一句很短的感想');if(p){p.reflections=p.reflections||[];p.reflections.push({time:now(),text});}log(`${p?p.name:'某位玩家'}提交了本轮事件感想。`);save();closeModal();}
-    function releaseBufferedClues(){let count=0;state.bufferedClues.forEach(c=>{if(c.ready&&!c.released){c.released=true;c.releaseTime=now();state.releasedClues.push(c);count++;}});if(count)log(`系统延迟发放了${count}条守护线索。`,'gold');else toast('暂无可发放线索');save();renderAll();}
-    function renderClues(){const p=getMe();const clues=p?state.releasedClues.filter(c=>c.to===p.id):[];document.getElementById('myClues').innerHTML=p?(clues.length?clues.map((c,i)=>`<div class="log-item gold"><strong>线索${i+1}</strong><br>${esc(c.fog?fogText(c.text):c.text)}<div class="small muted">${c.releaseTime||c.time}</div></div>`).join(''):'<div class="muted">你还没有收到线索。</div>'):'<div class="muted">请选择身份。</div>';document.getElementById('bufferedClues').innerHTML=state.bufferedClues.length?state.bufferedClues.map(c=>`<div class="log-item"><strong>${esc(getPlayer(c.to)?.name||'未知')}的线索</strong><br><span class="muted small">状态：${c.released?'已发放':(c.ready?'可发放':'等待下一轮')}</span><br>${esc(c.text)}</div>`).join(''):'<div class="muted">暂无缓冲线索。</div>';}
-    function fogText(text){return '这条线索被迷雾处理：'+(text.length>18?text.slice(0,6)+'……'+text.slice(-6):'TA留下了一个不太明显的痕迹。');} function saveMyNote(show=false){const p=getMe();if(!p)return;p.note=document.getElementById('myNote').value;save();if(show)toast('备注已保存');}
-    function openResourceModal(){const p=getMe();if(!p)return toast('请先选择身份');showModal(`<h2>资源 / 补卡</h2><p class="muted">手牌上限为4张。</p><div class="row"><span class="chip">当前手牌：${handCount(p)}/4</span><span class="chip">春风点：${p.springPoints||0}</span><span class="chip">任务换卡：${p.exchangeUsed?'已用':'未用'}</span></div><div class="btns two" style="margin-top:12px"><button class="btn" onclick="useSpringPoint('card')">春风点：抽1张卡</button><button class="btn secondary" onclick="useSpringPoint('clue')">春风点：获得调查线索</button><button class="btn secondary" onclick="useSpringPoint('change')">春风点：获得换题权</button><button class="btn gold" onclick="taskExchangeCard()">任务换卡</button></div><button class="btn secondary full" style="margin-top:12px" onclick="closeModal()">关闭</button>`);} function drawCardToPlayer(p){if(handCount(p)>=4){toast('手牌已达上限4张');return false;}const key=pick(['wu','tao','straw','spring']);p.cards[key]=(p.cards[key]||0)+1;return true;} function useSpringPoint(type){const p=getMe();if(!p)return;if((p.springPoints||0)<=0)return toast('春风点不足');if(type==='card'){if(!drawCardToPlayer(p))return;log(`${p.name}使用春风点获得了一张守护卡。`,'gold');}if(type==='clue'){const g=actualGuardianOf(p.id);state.releasedClues.push({id:id(),from:'system',to:p.id,text:g?`额外调查线索：你的守护者本场目前实际守护次数为${g.guardianActs||0}次。`:'额外调查线索暂不可用。',fog:false,mode:'spring',time:now(),released:true,releaseTime:now()});log(`${p.name}使用春风点获得了一条额外调查线索。`,'gold');}if(type==='change'){p.changeTokens=(p.changeTokens||0)+1;log(`${p.name}使用春风点获得了1次换题权记录。`,'gold');}p.springPoints--;save();closeModal();renderAll();} function taskExchangeCard(){const p=getMe();if(!p)return;if(p.exchangeUsed)return toast('每人整场只能任务换卡1次');if(state.currentEvent)return toast('任务换卡只能在事件间隙使用');if(!drawCardToPlayer(p))return;p.exchangeUsed=true;p.debtTasks=p.debtTasks||[];p.debtTasks.push({text:pick(debtTasks),done:false,time:now()});log(`${p.name}使用了任务换卡，欠账任务将在终局前完成。`,'gold');save();closeModal();renderAll();}
-    function openAdminModal(){showModal(`<h2>轻主持控制</h2><p class="muted">轻主持只负责推进，不查看隐藏身份。</p><div class="btns two"><button class="btn blue" onclick="releaseBufferedClues();closeModal();">发放缓冲线索</button><button class="btn gold" onclick="stageSupply();closeModal();">阶段补给：每人抽1张</button><button class="btn secondary" onclick="markDebtTasksDone();closeModal();">标记欠账任务已处理</button><button class="btn secondary" onclick="openFinalModal();">进入终局回答</button></div><button class="btn secondary full" style="margin-top:12px" onclick="closeModal()">关闭</button>`);} function stageSupply(){if(state.supplyUsed)return toast('阶段补给整场只能触发1次');state.players.forEach(p=>drawCardToPlayer(p));state.supplyUsed=true;log('阶段补给已触发：每位未满手牌上限的玩家抽1张守护卡。','gold');save();renderAll();} function markDebtTasksDone(){state.players.forEach(p=>(p.debtTasks||[]).forEach(d=>d.done=true));log('系统已标记所有欠账任务完成或进入现场处理。');save();renderAll();}
-    function openFinalModal(){const p=getMe();if(!p)return toast('请先选择身份');showModal(`<h2>终局回答</h2><label>我猜自己的守护者是<select id="guessGuardian">${state.players.filter(x=>x.id!==p.id).map(x=>`<option value="${x.id}" ${state.final.guesses[p.id]===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></label><label style="display:block;margin-top:10px">我的理由<textarea id="guessReason">${esc(state.final.reasons[p.id]?.guess||'')}</textarea></label><label style="display:block;margin-top:10px">我投今日MVP给<select id="mvpVote">${state.players.map(x=>`<option value="${x.id}" ${state.final.mvpVotes[p.id]===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></label><label style="display:block;margin-top:10px">MVP理由<textarea id="mvpReason">${esc(state.final.reasons[p.id]?.mvp||'')}</textarea></label><button class="btn full" style="margin-top:12px" onclick="submitFinalAnswers()">提交终局回答</button>`);} function submitFinalAnswers(){const p=getMe();state.final.guesses[p.id]=document.getElementById('guessGuardian').value;state.final.mvpVotes[p.id]=document.getElementById('mvpVote').value;state.final.reasons[p.id]={guess:document.getElementById('guessReason').value.trim(),mvp:document.getElementById('mvpReason').value.trim()};save();closeModal();renderAll();toast('终局回答已提交');} function finishGame(){state.final.finished=true;log('终局揭晓已生成。','gold');save();renderAll();}
-    function calcCorrect(){return state.players.filter(p=>state.final.guesses[p.id]===actualGuardianOf(p.id)?.id);} function scoreEffort(p){const rate=p.guardianChances?(p.guardianActs||0)/p.guardianChances:0;return Math.round((p.guardianActs||0)*10+rate*20+(p.cluesGiven||0)*3);} function scoreBestGuardian(p){const notGuessed=state.final.guesses[p.guardTarget]!==p.id?10:0;const rate=p.guardianChances?(p.guardianActs||0)/p.guardianChances:0;return Math.round((p.guardianActs||0)*12+rate*18+(p.cluesGiven||0)*5+notGuessed-((p.guardianActs||0)===0?25:0));}
-    function renderFinal(){document.getElementById('finalSummary').innerHTML=`<div class="row"><span class="chip">已提交：${Object.keys(state.final.guesses||{}).length}/${state.players.length}</span><span class="chip">猜对人数：${calcCorrect().length}</span></div>`;document.getElementById('finalTable').innerHTML=`<table><thead><tr><th>玩家</th><th>TA守护了谁</th><th>谁守护TA</th><th>TA猜的是谁</th><th>结果</th></tr></thead><tbody>${state.players.map(p=>{const actual=actualGuardianOf(p.id),guess=getPlayer(state.final.guesses[p.id]);return`<tr><td>${esc(p.name)}</td><td>${esc(getPlayer(p.guardTarget)?.name||'')}</td><td>${esc(actual?.name||'')}</td><td>${esc(guess?.name||'未提交')}</td><td>${guess&&actual&&guess.id===actual.id?'✅猜对':'—'}</td></tr>`;}).join('')}</tbody></table>`;renderAwards();renderReports();}
-    function renderAwards(){const ps=state.players;if(!ps.length){document.getElementById('awards').innerHTML='<div class="muted">暂无。</div>';return;}const effort=[...ps].sort((a,b)=>scoreEffort(b)-scoreEffort(a))[0],best=[...ps].sort((a,b)=>scoreBestGuardian(b)-scoreBestGuardian(a))[0],hidden=[...ps].filter(p=>(p.guardianActs||0)>=1&&state.final.guesses[p.guardTarget]!==p.id).sort((a,b)=>(b.guardianActs||0)-(a.guardianActs||0))[0];const confuse={};Object.entries(state.final.guesses||{}).forEach(([guesser,guessed])=>{if(actualGuardianOf(guesser)?.id!==guessed)confuse[guessed]=(confuse[guessed]||0)+1;});const confusing=Object.entries(confuse).sort((a,b)=>b[1]-a[1])[0];const mvps={};Object.values(state.final.mvpVotes||{}).forEach(v=>{mvps[v]=(mvps[v]||0)+1;});const mvp=Object.entries(mvps).sort((a,b)=>b[1]-a[1])[0];const cards=[['今日MVP',mvp?`${getPlayer(mvp[0])?.name}（${mvp[1]}票）`:'暂无投票'],['最佳守护者',best?`${best.name}（综合评分${scoreBestGuardian(best)}）`:'暂无'],['最努力守护的人',effort?`${effort.name}（机会${effort.guardianChances||0}，守护${effort.guardianActs||0}）`:'暂无'],['隐藏最深的人',hidden?`${hidden.name}（守护过且未被猜中）`:'暂无'],['最会推理的人',calcCorrect().length?calcCorrect().map(p=>p.name).join('、'):'暂无猜对者'],['最迷惑的人',confusing?`${getPlayer(confusing[0])?.name}（被${confusing[1]}人误猜）`:'暂无']];document.getElementById('awards').innerHTML=cards.map(([t,v])=>`<div class="card-face third"><strong>${esc(t)}</strong><div class="muted">${esc(v)}</div></div>`).join('');}
-    function renderReports(){document.getElementById('reports').innerHTML=state.players.length?state.players.map(p=>{const usage=Object.entries(p.cardUsage||{}).map(([k,v])=>`${cardDefs[k]?.name||k}×${v}`).join('，')||'无';const debts=(p.debtTasks||[]).length?`；欠账任务：${(p.debtTasks||[]).filter(d=>d.done).length}/${(p.debtTasks||[]).length}已处理`:'';return`<div class="log-item"><strong>${esc(p.name)}的守护报告</strong><br>守护对象：${esc(getPlayer(p.guardTarget)?.name||'')}<br>守护机会：${p.guardianChances||0}；实际守护：${p.guardianActs||0}；线索提交：${p.cluesGiven||0}${debts}<br>使用卡牌：${esc(usage)}<br>系统评价：${esc(evaluateGuardian(p))}</div>`;}).join(''):'<div class="muted">暂无。</div>';} function evaluateGuardian(p){if((p.guardianActs||0)===0)return'隐藏得很好，但守护参与度较低。';const guessed=state.final.guesses[p.guardTarget]===p.id;if((p.guardianActs||0)>=2&&!guessed)return'积极出手且隐藏较好。';if((p.guardianActs||0)>=2&&guessed)return'守护很积极，但痕迹也比较明显。';return'有守护行为，参与程度中等。';}
-    function renderSettings(){const inputs=document.getElementById('playerInputs');if(inputs&&!inputs.dataset.ready){inputs.innerHTML=Array.from({length:8},(_,i)=>`<input id="playerName${i}" placeholder="玩家${i+1}姓名">`).join('');inputs.dataset.ready='1';}const taskBox=document.getElementById('taskLibrary'),punishBox=document.getElementById('punishLibrary');if(taskBox&&document.activeElement!==taskBox)taskBox.value=state.tasks.join('\n');if(punishBox&&document.activeElement!==punishBox)punishBox.value=state.punishments.join('\n');renderAccessCodes();renderRolePanel();}
-    function initGame(){const names=Array.from({length:8},(_,i)=>document.getElementById('playerName'+i).value.trim()).filter(Boolean);if(names.length<3)return toast('至少需要3人，建议8人');const ids=names.map(()=>id()),order=shuffle(ids);const players=names.map((name,i)=>({id:ids[i],name,guardTarget:null,accessCode:makeAccessCode(i),cards:dealCards(),genericClueUsed:false,fogUsed:false,springPoints:0,guardianChances:0,guardianActs:0,cluesGiven:0,cardUsage:{},reflections:[],note:'',exchangeUsed:false,debtTasks:[]}));order.forEach((pid,idx)=>{players.find(x=>x.id===pid).guardTarget=order[(idx+1)%order.length];});state=freshState();state.started=true;state.players=players;me=players[0].id;localStorage.setItem('picnic_guardian_me',me);log('游戏开始。系统已随机生成守护关系，并发放开局手牌。','gold');save();renderAll();go('home');} function dealCards(){const cards={wu:1,tao:0,straw:0,spring:0};shuffle(['tao','straw','spring']).slice(0,2).forEach(k=>cards[k]++);return cards;} function fillDemoNames(){['A','B','C','D','E','F','G','H'].forEach((n,i)=>{document.getElementById('playerName'+i).value=n;});} function saveLibraries(){state.tasks=document.getElementById('taskLibrary').value.split('\n').map(s=>s.trim()).filter(Boolean);state.punishments=document.getElementById('punishLibrary').value.split('\n').map(s=>s.trim()).filter(Boolean);save();toast('任务库和惩罚库已保存');}
-    function renderAccessCodes(){const box=document.getElementById('accessCodeBox');if(!box)return;if(!state.started||!state.players.length){box.innerHTML='<div class="notice">游戏开始后，这里会显示每位玩家的加入码。请分别私发，不要群发截图。</div>';return;}box.innerHTML=`<h3>玩家加入码</h3><p class="small muted">请分别私发给对应玩家。</p><div class="player-list">${state.players.map(p=>`<div class="player"><div><strong>${esc(p.name)}</strong><div class="muted small">加入码：${esc(p.accessCode||'')}</div></div><button class="btn secondary" onclick="copyJoinText('${p.id}')">复制</button></div>`).join('')}</div>`;} function copyJoinText(pid){const p=getPlayer(pid);const text=`五一公园守护局｜你的姓名：${p.name}｜加入码：${p.accessCode}`;copyText(text,'已复制加入信息');}
-    function renderRolePanel(){const panel=document.getElementById('rolePanel');if(!panel)return;panel.innerHTML=`<strong>当前：${role==='host'?'房主/轻主持视图':'玩家视图'}</strong><div class="muted small">玩家视图会隐藏创建事件、线索缓冲区、阶段补给、终局生成等控制功能。</div><div class="btns two"><button class="btn ${role==='player'?'secondary':'blue'}" onclick="setRole('player')">切到玩家视图</button><button class="btn ${role==='host'?'secondary':'gold'}" onclick="setRole('host')">切到房主视图</button></div>`;} function applyRoleView(){document.querySelectorAll('.host-only').forEach(el=>el.classList.toggle('role-hidden',role!=='host'));}
-    function setRole(r){if(r==='host'&&role!=='host'&&!confirm('切换到房主/轻主持视图后，可以创建事件、发放线索和生成终局。确定切换吗？'))return;role=r;localStorage.setItem('picnic_guardian_role',role);renderAll();toast(role==='host'?'已切换到房主视图':'已切换到玩家视图');}
-    function openRoleModal(){showModal(`<h2>切换视图</h2><p class="muted">普通成员建议使用玩家视图；负责推进流程的人使用房主/轻主持视图。</p><div class="btns two"><button class="btn blue" onclick="setRole('player');closeModal();">玩家视图</button><button class="btn gold" onclick="setRole('host');closeModal();">房主/轻主持视图</button></div><button class="btn secondary full" style="margin-top:10px" onclick="closeModal()">关闭</button>`);} function openHostStartModal(){setRole('host');showModal(`<h2>房主/轻主持入口</h2><p class="muted">第一次使用请先到设置页创建游戏，并按需配置联机同步。</p><div class="btns two"><button class="btn gold" onclick="closeModal();go('settings');">去设置/创建游戏</button><button class="btn blue" onclick="closeModal();go('event');">去创建事件</button></div>`);} 
-    function openPlayerStartModal(){const cfg=readCloudConfig();showModal(`<h2>玩家加入游戏</h2><p class="muted">先连接房间，再用姓名和加入码进入自己的身份。</p><div class="setup-inputs"><label>Supabase URL<input id="startCloudUrl" value="${esc(cfg.url||'')}"></label><label>Supabase key<input id="startCloudKey" value="${esc(cfg.key||'')}"></label><label>房间码<input id="startCloudRoom" value="${esc(cfg.roomId||cloud.roomId||'')}"></label><label>我的姓名<input id="startJoinName"></label><label>我的加入码<input id="startJoinCode"></label></div><button class="btn blue full" style="margin-top:12px" onclick="playerStartJoin()">连接房间并进入身份</button><button class="btn secondary full" style="margin-top:10px" onclick="closeModal()">关闭</button>`);} async function playerStartJoin(){const url=document.getElementById('startCloudUrl').value.trim(),key=document.getElementById('startCloudKey').value.trim(),roomId=document.getElementById('startCloudRoom').value.trim().toUpperCase(),name=document.getElementById('startJoinName').value.trim(),code=document.getElementById('startJoinCode').value.trim().toUpperCase();if(url&&key&&roomId){document.getElementById('cloudUrl').value=url;document.getElementById('cloudKey').value=key;document.getElementById('cloudRoom').value=roomId;await connectCloud();}const p=state.players.find(x=>x.name===name&&String(x.accessCode||'').toUpperCase()===code);if(!p)return toast('未找到对应身份，请检查姓名和加入码');role='player';localStorage.setItem('picnic_guardian_role',role);setMe(p.id);closeModal();toast(`已进入${p.name}的玩家视图`);go('me');}
-    function readCloudConfig(){const params=new URLSearchParams(location.search);let cfg={};try{cfg=JSON.parse(localStorage.getItem(CLOUD_STORE)||'{}');}catch(e){}const fromUrl={url:params.get('sburl')||cfg.url||'',key:params.get('sbkey')||cfg.key||'',roomId:(params.get('room')||cfg.roomId||'').toUpperCase()};if(params.get('role')){role=params.get('role')==='host'?'host':'player';localStorage.setItem('picnic_guardian_role',role);}if(fromUrl.url||fromUrl.key||fromUrl.roomId)localStorage.setItem(CLOUD_STORE,JSON.stringify(fromUrl));return fromUrl;} function renderCloudSettings(){const cfg=readCloudConfig();const url=document.getElementById('cloudUrl'),key=document.getElementById('cloudKey'),room=document.getElementById('cloudRoom');if(url&&document.activeElement!==url)url.value=cfg.url||'';if(key&&document.activeElement!==key)key.value=cfg.key||'';if(room&&document.activeElement!==room)room.value=cfg.roomId||'';const status=document.getElementById('cloudStatus');if(status)status.textContent=cloud.lastStatus;}
-    function getCloudInputs(){return{url:document.getElementById('cloudUrl')?.value.trim()||'',key:document.getElementById('cloudKey')?.value.trim()||'',roomId:(document.getElementById('cloudRoom')?.value.trim()||'').toUpperCase()};} async function connectCloud(){const cfg=getCloudInputs();if(!cfg.url||!cfg.key||!cfg.roomId)return toast('请填写URL、key和房间码');if(!window.supabase)return toast('Supabase脚本未加载，请检查网络');localStorage.setItem(CLOUD_STORE,JSON.stringify(cfg));cloud.client=window.supabase.createClient(cfg.url,cfg.key);cloud.roomId=cfg.roomId;cloud.enabled=true;cloud.lastStatus=`正在连接房间${cfg.roomId}...`;renderAll();await pullCloudNow(true);subscribeCloud();cloud.lastStatus=`已连接房间${cfg.roomId}。`;renderAll();} function disconnectCloud(){if(cloud.subscription&&cloud.client)cloud.client.removeChannel(cloud.subscription);cloud={enabled:false,client:null,roomId:'',subscription:null,applyingRemote:false,pushTimer:null,lastStatus:'已断开云同步，当前回到本机模式。'};renderAll();} function scheduleCloudPush(){if(!cloud.enabled||!cloud.client||cloud.applyingRemote)return;clearTimeout(cloud.pushTimer);cloud.pushTimer=setTimeout(()=>pushCloudNow(false),700);} async function pushCloudNow(showToast=true){if(!cloud.enabled||!cloud.client||!cloud.roomId){if(showToast)toast('未连接云同步');return;}const{error}=await cloud.client.from('picnic_rooms').upsert({room_id:cloud.roomId,payload:clone(state),updated_at:new Date().toISOString()});if(error){cloud.lastStatus=`上传失败：${error.message}`;renderAll();if(showToast)toast('上传失败');return;}cloud.lastStatus=`已上传：${new Date().toLocaleTimeString('zh-CN')}`;renderAll();if(showToast)toast('已上传当前数据');} async function pullCloudNow(silent=false){if(!cloud.enabled||!cloud.client||!cloud.roomId){if(!silent)toast('未连接云同步');return;}const{data,error}=await cloud.client.from('picnic_rooms').select('payload').eq('room_id',cloud.roomId).maybeSingle();if(error){cloud.lastStatus=`拉取失败：${error.message}`;renderAll();if(!silent)toast('拉取失败');return;}if(data&&data.payload){cloud.applyingRemote=true;state=data.payload;localStorage.setItem(STORE,JSON.stringify(state));cloud.applyingRemote=false;cloud.lastStatus=`已拉取房间${cloud.roomId}数据。`;renderAll();if(!silent)toast('已拉取房间数据');}else{await pushCloudNow(false);if(!silent)toast('房间为空，已用当前数据创建房间');}} function subscribeCloud(){if(!cloud.enabled||!cloud.client||!cloud.roomId)return;if(cloud.subscription)cloud.client.removeChannel(cloud.subscription);cloud.subscription=cloud.client.channel('picnic_room_'+cloud.roomId).on('postgres_changes',{event:'*',schema:'public',table:'picnic_rooms',filter:`room_id=eq.${cloud.roomId}`},payload=>{const next=payload.new?.payload;if(!next)return;cloud.applyingRemote=true;state=next;localStorage.setItem(STORE,JSON.stringify(state));cloud.applyingRemote=false;cloud.lastStatus=`收到同步：${new Date().toLocaleTimeString('zh-CN')}`;renderAll();}).subscribe();} function copyPlayerEntryLink(){const cfg=getCloudInputs();if(!cfg.url||!cfg.key||!cfg.roomId)return toast('请先填写联机信息和房间码');const u=new URL(location.href.split('#')[0]);u.searchParams.set('role','player');u.searchParams.set('room',cfg.roomId);u.searchParams.set('sburl',cfg.url);u.searchParams.set('sbkey',cfg.key);copyText(u.toString(),'已复制玩家入口链接');}
-    function exportData(){const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`五一公园守护局_${Date.now()}.json`;a.click();URL.revokeObjectURL(a.href);} function importData(e){const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{try{state=JSON.parse(reader.result);save();renderAll();toast('导入成功');}catch(err){toast('导入失败');}};reader.readAsText(file);} function resetAllConfirm(){if(confirm('确定彻底重置？所有记录都会清空。')){localStorage.removeItem(STORE);state=freshState();save();renderAll();}} function clearLogsConfirm(){if(confirm('确定清空公共事件记录？')){state.logs=[];save();renderAll();}}
-    function showModal(html){document.getElementById('modalRoot').innerHTML=`<div class="modal-backdrop" onclick="if(event.target.className==='modal-backdrop')closeModal()"><div class="modal">${html}</div></div>`;} function closeModal(){document.getElementById('modalRoot').innerHTML='';} function copyText(text,msg){if(navigator.clipboard&&location.protocol==='https:')navigator.clipboard.writeText(text).then(()=>toast(msg)).catch(()=>prompt('请手动复制',text));else prompt('请手动复制',text);}
-    readCloudConfig();renderAll();
+    // ====== 只需要改这里两行 ======
+    const SUPABASE_URL = "PASTE_YOUR_SUPABASE_URL_HERE";
+    const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_ANON_KEY_HERE";
+    // =============================
+
+    const TASKS = [
+      "在不明显的情况下，让你的守护对象今天至少笑一次。",
+      "找机会自然地接一次 TA 的话，让 TA 不冷场。",
+      "在集体活动中给 TA 创造一次轻松参与的机会。",
+      "悄悄注意 TA 有没有需要水、纸巾、零食或其他东西，并自然地提供帮助。",
+      "在不暴露身份的情况下，夸 TA 一次，可以是通过集体聊天、玩笑或留言完成。",
+      "找机会让 TA 在小游戏中获得一次小优势。",
+      "今天至少和 TA 发生一次自然互动，但不能让 TA 明显觉得你是故意的。",
+      "在大家聊天时，帮 TA 延续一个话题。",
+      "如果 TA 有点安静，想办法让 TA 被大家自然注意到一次。",
+      "今天找机会帮 TA 拿一样东西，但要表现得像顺手。",
+      "拍照时让 TA 处在比较好看的位置，或者提醒大家给 TA 留位置。",
+      "在不直接表明身份的情况下，给 TA 留下一句鼓励。",
+      "如果 TA 被调侃或有点尴尬，帮 TA 圆一下场。",
+      "今天至少观察到 TA 的一个小细节，并把它变成线索。",
+      "在游戏中给 TA 一次合理的帮助，但不能太明显偏袒。",
+      "给 TA 制造一次被照顾但不确定是谁照顾的体验。",
+      "在吃东西时，让 TA 更容易拿到喜欢的食物或饮料。",
+      "今天和 TA 保持一次刚好出现的巧合。",
+      "在群体行动中提醒一次和 TA 有关的小事，比如别落东西、注意安全、该集合了。",
+      "让 TA 今天收到一条匿名留言，但内容不能太直白。",
+      "在不让 TA 发现的情况下，帮 TA 解决一个小麻烦。",
+      "找机会让 TA 在别人面前被轻轻夸一次。",
+      "观察 TA 今天和谁互动最多，并用这个做一条模糊线索。",
+      "今天给 TA 一次好运感，比如让 TA 抽到好东西、先选、优先参与。",
+      "游戏结束前，给 TA 留一条最终线索，让 TA 有一点点可能猜到你。",
+      "找机会把一个轻松的话题递给 TA，让 TA 自然参与聊天。",
+      "今天至少一次主动照顾 TA 的情绪，但不要表现得像专门盯着 TA。",
+      "在大家分食物或饮料时，让 TA 不用主动开口也能被照顾到。",
+      "如果 TA 在某个环节犹豫，给 TA 一个不明显的支持信号。",
+      "帮 TA 记住一件容易被忘的小事，比如物品、顺序、规则或集合时间。",
+      "在不暴露身份的前提下，为 TA 制造一次被大家善意关注的机会。",
+      "今天至少一次让 TA 感到自己不是被忽略的人。",
+      "选择一个和 TA 有关的细节，稍后把它包装成匿名线索。",
+      "在某个小游戏中避免 TA 陷入尴尬处境。",
+      "给 TA 一次很小但真实的善意，让 TA 不确定这是不是巧合。"
+    ];
+
+    const PENALTIES = [
+      "用最正经的语气说一句很中二的话。",
+      "对着大家说一句：我承认，我刚刚有点可疑。",
+      "模仿一种动物走路 5 秒。",
+      "用播音腔读出一句普通的话，比如：我想喝水。",
+      "选一个人，真诚夸 TA 10 秒。",
+      "用非常夸张的语气介绍自己今天带来的食物或物品。",
+      "原地摆一个胜利但尴尬的姿势 3 秒。",
+      "对空气说一句道歉：对不起，是我暴露得太明显了。",
+      "用一句话解释为什么自己是优秀守护者。",
+      "和旁边的人击掌，并说：我们是临时同盟。",
+      "用气泡音、夹子音或播音腔说一句：我真的不是故意的。",
+      "从现场选一个物品，给它取一个正式名字。",
+      "做一个 3 秒钟的无实物表演，比如开门、打伞、吃面。",
+      "用“因为我是天才”开头说一句话。",
+      "对大家做一个很认真但没什么用的承诺。",
+      "给自己今天的表现打分，并说明理由。",
+      "用一句话夸一下今天的天气、食物或活动。",
+      "随机向一个人说：你今天看起来很有主角感。",
+      "用慢动作完成一次拿水或拿零食的动作。",
+      "说出自己今天最可疑的一个行为。",
+      "给任意一个人颁发一个奇怪奖项，比如最佳走神奖、最佳吃瓜奖。",
+      "用三个词形容自己现在的状态。",
+      "现场表演一个发现自己猜错了的表情。",
+      "做一个 5 秒钟的神秘守护者登场动作。",
+      "给大家留下一句谜语式发言，不能解释。",
+      "用一句话为自己刚才的行为强行辩解。",
+      "假装自己是游戏主持人，严肃宣布一条没有用的新规则。",
+      "随机选择一个人，和 TA 进行 3 秒钟认真对视，然后说：收到。",
+      "用夸张的方式说一句：这不是暴露，这是战术。",
+      "给今天的活动取一个电视剧名字。",
+      "模仿自己刚刚最慌的一瞬间。",
+      "用一句话评价自己的隐藏能力。",
+      "选择一个人，请 TA 给你布置一个不超过 5 秒的小动作。",
+      "用非常正式的语气感谢自己的守护对象，但不能说出名字。",
+      "向大家展示一个你认为最不像自己的表情。"
+    ];
+
+    const CLUES = [
+      "我的守护对象今天应该还没有发现我。",
+      "我的守护发生在一个很自然的瞬间。",
+      "TA 今天离我不算特别远。",
+      "我今天已经观察到 TA 至少一次。",
+      "我的守护和今天的某个小细节有关。",
+      "TA 可能还不知道自己已经被守护了。",
+      "我的守护对象今天参与过集体互动。",
+      "我暂时不会靠近得太明显。",
+      "今天的某个瞬间，我其实注意到了 TA。",
+      "我的守护方式比较低调。",
+      "我的守护和食物、饮料、游戏或拍照中的一个有关。",
+      "TA 今天和我有过一次比较近的距离。",
+      "我今天可能和 TA 说过话，也可能只是擦肩而过。",
+      "TA 今天的某个动作让我印象比较深。",
+      "我守护的人今天在大家视线里出现过很多次。",
+      "我的守护不是直接送东西，而是帮 TA 避免了一个小麻烦。",
+      "我今天曾经在 TA 附近出现过。",
+      "我的线索藏在一次很普通的互动里。",
+      "如果 TA 仔细回想，可能会发现我出现得有点巧。",
+      "我的守护对象今天收到过一种不明显的便利。",
+      "我今天和 TA 有过互动。",
+      "我今天帮 TA 做过一件小事。",
+      "TA 可能已经看到过我发的匿名留言。",
+      "我的守护和某一次集体活动有关。",
+      "我今天至少有一次是故意靠近 TA 的。",
+      "TA 今天可能被我间接照顾过。",
+      "我守护的人应该能从今天的某个细节里猜到一点。",
+      "我今天的某个行为不是完全随机的。",
+      "TA 如果回忆一下谁对自己刚好很好，可能会想到我。",
+      "最后一条线索：我比你想象中更早开始守护你。"
+    ];
+
+    const QUICK_MESSAGES = [
+      "你今天可能已经被悄悄守护过了。",
+      "请注意，今天有一份好运正在靠近你。",
+      "有人今天偷偷观察到了你的一个小细节。",
+      "你的守护者正在努力表现得不明显。",
+      "今天如果有一件事刚好顺利，可能不是巧合。",
+      "请继续保持自然，因为你的守护者也在假装自然。",
+      "你今天的某个瞬间已经被记录成线索了。",
+      "有人正在用很低调的方式照顾你。",
+      "你可能已经和你的守护者互动过了。",
+      "这条留言没有暴露身份，但它确实和你有关。"
+    ];
+
+    const configured = SUPABASE_URL.startsWith("https://") && SUPABASE_ANON_KEY.length > 20 && !SUPABASE_URL.includes("PASTE_");
+    const client = configured ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+    const $ = (id) => document.getElementById(id);
+
+    function getRoom() {
+      return ($("roomCode").value || "0501").trim();
+    }
+
+    function sampleThree(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy.slice(0, 3);
+    }
+
+    function renderResult(el, items) {
+      el.innerHTML = "";
+      const title = document.createElement("div");
+      title.className = "small";
+      title.textContent = "本次抽取结果：";
+      const ol = document.createElement("ol");
+      items.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        ol.appendChild(li);
+      });
+      el.appendChild(title);
+      el.appendChild(ol);
+    }
+
+    function setBusy(button, busy) {
+      button.disabled = busy;
+      button.textContent = busy ? "保存中……" : button.dataset.label;
+    }
+
+    async function addEvent(eventType, content, fromName = "匿名守护者", toName = "大家") {
+      if (!configured) {
+        alert("还没有配置 Supabase，无法保存公共记录。请先在代码顶部填写 URL 和 anon key。");
+        return false;
+      }
+      const { error } = await client.from("game_events").insert({
+        room_code: getRoom(),
+        event_type: eventType,
+        from_name: fromName || "匿名守护者",
+        to_name: toName || "大家",
+        content
+      });
+      if (error) {
+        alert("保存失败：" + error.message);
+        return false;
+      }
+      await loadWall();
+      return true;
+    }
+
+    async function drawAndSave(type) {
+      const isTask = type === "task";
+      const btn = isTask ? $("drawTaskBtn") : $("drawPenaltyBtn");
+      const resultEl = isTask ? $("taskResult") : $("penaltyResult");
+      const items = sampleThree(isTask ? TASKS : PENALTIES);
+      renderResult(resultEl, items);
+      setBusy(btn, true);
+      const label = isTask ? "守护任务" : "小惩罚";
+      await addEvent(type, items.map((x, i) => `${i + 1}. ${x}`).join("\n"), "系统抽取", label);
+      setBusy(btn, false);
+    }
+
+    function formatTime(iso) {
+      try {
+        return new Date(iso).toLocaleString("zh-CN", {
+          month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit"
+        });
+      } catch {
+        return "";
+      }
+    }
+
+    function entryLabel(row) {
+      if (row.event_type === "task") return "守护任务抽取";
+      if (row.event_type === "penalty") return "小惩罚抽取";
+      return `${row.from_name || "匿名守护者"} 对 ${row.to_name || "大家"} 留言`;
+    }
+
+    function renderWall(rows) {
+      const wall = $("wall");
+      wall.innerHTML = "";
+      if (!rows || rows.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "entry";
+        empty.textContent = "还没有记录。先抽一次任务，或者发一条留言吧。";
+        wall.appendChild(empty);
+        return;
+      }
+
+      rows.forEach(row => {
+        const entry = document.createElement("div");
+        entry.className = "entry";
+
+        const top = document.createElement("div");
+        top.className = "entryTop";
+
+        const tag = document.createElement("span");
+        tag.className = "tag";
+        tag.textContent = entryLabel(row);
+
+        const time = document.createElement("span");
+        time.className = "time";
+        time.textContent = formatTime(row.created_at);
+
+        const content = document.createElement("div");
+        content.className = "entryContent";
+        content.textContent = row.content || "";
+
+        top.appendChild(tag);
+        top.appendChild(time);
+        entry.appendChild(top);
+        entry.appendChild(content);
+        wall.appendChild(entry);
+      });
+    }
+
+    async function loadWall() {
+      if (!configured) {
+        $("setupWarn").style.display = "block";
+        renderWall([]);
+        return;
+      }
+      const { data, error } = await client
+        .from("game_events")
+        .select("id, room_code, event_type, from_name, to_name, content, created_at")
+        .eq("room_code", getRoom())
+        .order("created_at", { ascending: false })
+        .limit(80);
+      if (error) {
+        $("wall").innerHTML = `<div class="entry">加载失败：${error.message}</div>`;
+        return;
+      }
+      renderWall(data);
+    }
+
+    async function sendMessage() {
+      const fromName = ($("fromName").value || "匿名守护者").trim();
+      const toName = ($("toName").value || "大家").trim();
+      const content = ($("messageText").value || "").trim();
+      if (!content) {
+        alert("请先输入留言内容。")
+        return;
+      }
+      setBusy($("sendMsgBtn"), true);
+      const ok = await addEvent("message", content, fromName, toName);
+      setBusy($("sendMsgBtn"), false);
+      if (ok) $("messageText").value = "";
+    }
+
+    function renderClues() {
+      const groups = [$("clueA"), $("clueB"), $("clueC")];
+      groups.forEach(g => g.innerHTML = "");
+      CLUES.slice(0, 10).forEach(x => addClue($("clueA"), x));
+      CLUES.slice(10, 20).forEach(x => addClue($("clueB"), x));
+      CLUES.slice(20, 30).forEach(x => addClue($("clueC"), x));
+    }
+
+    function addClue(parent, text) {
+      const li = document.createElement("li");
+      li.textContent = text;
+      parent.appendChild(li);
+    }
+
+    function init() {
+      $("drawTaskBtn").dataset.label = "随机抽 3 条任务";
+      $("drawPenaltyBtn").dataset.label = "随机抽 3 条惩罚";
+      $("sendMsgBtn").dataset.label = "发布留言";
+
+      const savedRoom = localStorage.getItem("guardian_room_code");
+      if (savedRoom) $("roomCode").value = savedRoom;
+
+      $("saveRoomBtn").addEventListener("click", () => {
+        localStorage.setItem("guardian_room_code", getRoom());
+        loadWall();
+        alert("房间码已保存。")
+      });
+
+      $("drawTaskBtn").addEventListener("click", () => drawAndSave("task"));
+      $("drawPenaltyBtn").addEventListener("click", () => drawAndSave("penalty"));
+      $("sendMsgBtn").addEventListener("click", sendMessage);
+      $("refreshBtn").addEventListener("click", loadWall);
+      $("quickMsgBtn").addEventListener("click", () => {
+        $("messageText").value = QUICK_MESSAGES[Math.floor(Math.random() * QUICK_MESSAGES.length)];
+      });
+
+      renderClues();
+      loadWall();
+      setInterval(loadWall, 8000);
+    }
+
+    init();
   </script>
 </body>
 </html>
