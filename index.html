@@ -48,7 +48,7 @@
 
     .subtitle {
       margin: 0 auto;
-      max-width: 720px;
+      max-width: 760px;
       color: var(--muted);
       font-size: 15px;
     }
@@ -84,6 +84,16 @@
       color: var(--muted);
       font-size: 14px;
       margin: 0 0 12px;
+    }
+
+    .privateNote {
+      margin-top: 8px;
+      border: 1px dashed var(--accent-2);
+      background: #fff9f3;
+      border-radius: 16px;
+      padding: 10px;
+      color: #7a4a2e;
+      font-size: 13px;
     }
 
     .roombar {
@@ -222,6 +232,11 @@
       font-weight: 700;
     }
 
+    .tag.private {
+      background: #eef8ff;
+      color: #2b6285;
+    }
+
     .time {
       color: var(--muted);
       font-size: 12px;
@@ -284,9 +299,9 @@
   <div class="wrap">
     <header>
       <h1>五一匿名守护行动</h1>
-      <p class="subtitle">随机抽取任务和小惩罚，每次抽取都会记录时间与内容；线索库直接查看；公共留言墙可以匿名显示“谁对谁留言”。</p>
+      <p class="subtitle">任务和小惩罚只保存在自己的手机/浏览器里，别人看不到；匿名留言墙是公共的，所有同房间码的人都能看到。</p>
       <div id="setupWarn" class="setupWarn">
-        还没有配置 Supabase。请先在代码顶部填写 <b>SUPABASE_URL</b> 和 <b>SUPABASE_ANON_KEY</b>，否则只能看到页面，不能保存公共记录。
+        还没有配置 Supabase。请先在代码顶部填写 <b>SUPABASE_URL</b> 和 <b>SUPABASE_ANON_KEY</b>，否则匿名公共留言墙不能保存和同步。
       </div>
       <div class="roombar">
         <div>
@@ -300,21 +315,34 @@
     <main class="grid">
       <section class="card">
         <h2>守护任务抽取</h2>
-        <p class="hint">每次随机抽 3 条，可以多次抽取；抽取结果会同步记录到公共记录里。</p>
+        <p class="hint">每次随机抽 3 条，可以多次抽取；抽取结果只会保存在你自己的设备里。</p>
         <button id="drawTaskBtn">随机抽 3 条任务</button>
         <div id="taskResult" class="resultBox">还没有抽取任务。</div>
+        <div class="privateNote">私人内容：别人不会在公共留言墙看到你的任务抽取结果。</div>
       </section>
 
       <section class="card">
         <h2>小惩罚抽取</h2>
-        <p class="hint">适合猜错、太明显、任务失败或现场临时加戏时使用。</p>
+        <p class="hint">适合猜错、太明显、任务失败或现场临时加戏时使用；只在自己设备记录。</p>
         <button id="drawPenaltyBtn">随机抽 3 条惩罚</button>
         <div id="penaltyResult" class="resultBox">还没有抽取惩罚。</div>
+        <div class="privateNote">私人内容：惩罚抽取结果不会上传到 Supabase。</div>
+      </section>
+
+      <section class="card full">
+        <div class="entryTop">
+          <h2 style="margin:0;">我的本机抽取记录</h2>
+          <button id="clearLocalBtn" class="secondary">清空本机记录</button>
+        </div>
+        <p class="hint">这里只显示你自己手机/浏览器里的任务和惩罚抽取记录，换设备或清理浏览器数据后可能消失。</p>
+        <div id="localHistory" class="wall">
+          <div class="entry">还没有本机抽取记录。</div>
+        </div>
       </section>
 
       <section class="card full">
         <h2>匿名公共留言</h2>
-        <p class="hint">可以显示“谁对谁留言”。为了保持神秘，发件人可以写“匿名守护者”“某个路过的人”“你的守护者”等。</p>
+        <p class="hint">留言是公共的，所有同房间码的人都能看到。为了保持神秘，发件人可以写“匿名守护者”“某个路过的人”“你的守护者”等。</p>
         <div class="formgrid">
           <div>
             <label for="fromName">谁留言</label>
@@ -337,10 +365,10 @@
 
       <section class="card full">
         <div class="entryTop">
-          <h2 style="margin:0;">公共记录与留言墙</h2>
+          <h2 style="margin:0;">公共匿名留言墙</h2>
           <button id="refreshBtn" class="secondary">刷新</button>
         </div>
-        <p class="hint">这里会显示所有抽取记录和所有公共留言。每 8 秒会自动刷新一次。</p>
+        <p class="hint">这里只显示大家发布的匿名留言，不显示任何人的任务和惩罚抽取结果。每 8 秒自动刷新一次。</p>
         <div id="wall" class="wall">
           <div class="entry">正在加载……</div>
         </div>
@@ -495,13 +523,23 @@
       "这条留言没有暴露身份，但它确实和你有关。"
     ];
 
-    const configured = SUPABASE_URL.startsWith("https://") && SUPABASE_ANON_KEY.length > 20 && !SUPABASE_URL.includes("PASTE_");
+    const configured =
+      SUPABASE_URL.startsWith("https://") &&
+      SUPABASE_URL.includes(".supabase.co") &&
+      SUPABASE_ANON_KEY &&
+      !SUPABASE_URL.includes("PASTE_") &&
+      !SUPABASE_ANON_KEY.includes("PASTE_");
+
     const client = configured ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
     const $ = (id) => document.getElementById(id);
 
     function getRoom() {
       return ($("roomCode").value || "0501").trim();
+    }
+
+    function localKey() {
+      return `guardian_private_draws_${getRoom()}`;
     }
 
     function sampleThree(arr) {
@@ -533,14 +571,91 @@
       button.textContent = busy ? "保存中……" : button.dataset.label;
     }
 
-    async function addEvent(eventType, content, fromName = "匿名守护者", toName = "大家") {
+    function formatTime(iso) {
+      try {
+        return new Date(iso).toLocaleString("zh-CN", {
+          month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit"
+        });
+      } catch {
+        return "";
+      }
+    }
+
+    function getLocalHistory() {
+      try {
+        return JSON.parse(localStorage.getItem(localKey()) || "[]");
+      } catch {
+        return [];
+      }
+    }
+
+    function saveLocalDraw(type, items) {
+      const history = getLocalHistory();
+      history.unshift({
+        id: `${Date.now()}_${Math.random().toString(16).slice(2)}`,
+        type,
+        created_at: new Date().toISOString(),
+        content: items.map((x, i) => `${i + 1}. ${x}`).join("\n")
+      });
+      localStorage.setItem(localKey(), JSON.stringify(history.slice(0, 80)));
+      renderLocalHistory();
+    }
+
+    function renderLocalHistory() {
+      const box = $("localHistory");
+      const history = getLocalHistory();
+      box.innerHTML = "";
+      if (!history.length) {
+        const empty = document.createElement("div");
+        empty.className = "entry";
+        empty.textContent = "还没有本机抽取记录。";
+        box.appendChild(empty);
+        return;
+      }
+
+      history.forEach(row => {
+        const entry = document.createElement("div");
+        entry.className = "entry";
+
+        const top = document.createElement("div");
+        top.className = "entryTop";
+
+        const tag = document.createElement("span");
+        tag.className = "tag private";
+        tag.textContent = row.type === "task" ? "我的守护任务" : "我的小惩罚";
+
+        const time = document.createElement("span");
+        time.className = "time";
+        time.textContent = formatTime(row.created_at);
+
+        const content = document.createElement("div");
+        content.className = "entryContent";
+        content.textContent = row.content || "";
+
+        top.appendChild(tag);
+        top.appendChild(time);
+        entry.appendChild(top);
+        entry.appendChild(content);
+        box.appendChild(entry);
+      });
+    }
+
+    function drawPrivate(type) {
+      const isTask = type === "task";
+      const resultEl = isTask ? $("taskResult") : $("penaltyResult");
+      const items = sampleThree(isTask ? TASKS : PENALTIES);
+      renderResult(resultEl, items);
+      saveLocalDraw(type, items);
+    }
+
+    async function addMessage(content, fromName = "匿名守护者", toName = "大家") {
       if (!configured) {
-        alert("还没有配置 Supabase，无法保存公共记录。请先在代码顶部填写 URL 和 anon key。");
+        alert("还没有配置 Supabase，无法保存公共留言。请先在代码顶部填写 URL 和 anon key / publishable key。");
         return false;
       }
       const { error } = await client.from("game_events").insert({
         room_code: getRoom(),
-        event_type: eventType,
+        event_type: "message",
         from_name: fromName || "匿名守护者",
         to_name: toName || "大家",
         content
@@ -553,41 +668,13 @@
       return true;
     }
 
-    async function drawAndSave(type) {
-      const isTask = type === "task";
-      const btn = isTask ? $("drawTaskBtn") : $("drawPenaltyBtn");
-      const resultEl = isTask ? $("taskResult") : $("penaltyResult");
-      const items = sampleThree(isTask ? TASKS : PENALTIES);
-      renderResult(resultEl, items);
-      setBusy(btn, true);
-      const label = isTask ? "守护任务" : "小惩罚";
-      await addEvent(type, items.map((x, i) => `${i + 1}. ${x}`).join("\n"), "系统抽取", label);
-      setBusy(btn, false);
-    }
-
-    function formatTime(iso) {
-      try {
-        return new Date(iso).toLocaleString("zh-CN", {
-          month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit"
-        });
-      } catch {
-        return "";
-      }
-    }
-
-    function entryLabel(row) {
-      if (row.event_type === "task") return "守护任务抽取";
-      if (row.event_type === "penalty") return "小惩罚抽取";
-      return `${row.from_name || "匿名守护者"} 对 ${row.to_name || "大家"} 留言`;
-    }
-
     function renderWall(rows) {
       const wall = $("wall");
       wall.innerHTML = "";
       if (!rows || rows.length === 0) {
         const empty = document.createElement("div");
         empty.className = "entry";
-        empty.textContent = "还没有记录。先抽一次任务，或者发一条留言吧。";
+        empty.textContent = "还没有公共留言。先发一条匿名留言吧。";
         wall.appendChild(empty);
         return;
       }
@@ -601,7 +688,7 @@
 
         const tag = document.createElement("span");
         tag.className = "tag";
-        tag.textContent = entryLabel(row);
+        tag.textContent = `${row.from_name || "匿名守护者"} 对 ${row.to_name || "大家"} 留言`;
 
         const time = document.createElement("span");
         time.className = "time";
@@ -625,10 +712,12 @@
         renderWall([]);
         return;
       }
+      $("setupWarn").style.display = "none";
       const { data, error } = await client
         .from("game_events")
         .select("id, room_code, event_type, from_name, to_name, content, created_at")
         .eq("room_code", getRoom())
+        .eq("event_type", "message")
         .order("created_at", { ascending: false })
         .limit(80);
       if (error) {
@@ -647,7 +736,7 @@
         return;
       }
       setBusy($("sendMsgBtn"), true);
-      const ok = await addEvent("message", content, fromName, toName);
+      const ok = await addMessage(content, fromName, toName);
       setBusy($("sendMsgBtn"), false);
       if (ok) $("messageText").value = "";
     }
@@ -676,19 +765,26 @@
 
       $("saveRoomBtn").addEventListener("click", () => {
         localStorage.setItem("guardian_room_code", getRoom());
+        renderLocalHistory();
         loadWall();
         alert("房间码已保存。")
       });
 
-      $("drawTaskBtn").addEventListener("click", () => drawAndSave("task"));
-      $("drawPenaltyBtn").addEventListener("click", () => drawAndSave("penalty"));
+      $("drawTaskBtn").addEventListener("click", () => drawPrivate("task"));
+      $("drawPenaltyBtn").addEventListener("click", () => drawPrivate("penalty"));
       $("sendMsgBtn").addEventListener("click", sendMessage);
       $("refreshBtn").addEventListener("click", loadWall);
+      $("clearLocalBtn").addEventListener("click", () => {
+        if (!confirm("确定要清空本机任务和惩罚抽取记录吗？这不会影响公共留言墙。")) return;
+        localStorage.removeItem(localKey());
+        renderLocalHistory();
+      });
       $("quickMsgBtn").addEventListener("click", () => {
         $("messageText").value = QUICK_MESSAGES[Math.floor(Math.random() * QUICK_MESSAGES.length)];
       });
 
       renderClues();
+      renderLocalHistory();
       loadWall();
       setInterval(loadWall, 8000);
     }
